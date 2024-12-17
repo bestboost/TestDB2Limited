@@ -1,0 +1,24 @@
+# Node.js
+node_modules/
+
+# .env файли
+.env
+.env.local
+.env.*.local
+
+# Логи
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Клієнтська частина (React)
+client/build/
+client/.env
+
+# Серверна частина
+server/build/
+server/.env
+
+# Додаткові тимчасові файли
+.DS_Store
+*.swp
