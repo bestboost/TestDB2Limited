@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import userRoutes from './routes/userRoutes.js';
+import voiceRecordRoutes from './routes/voiceRecordRoutes.js';
 
 dotenv.config(); // Завантаження змінних середовища
 
@@ -24,6 +26,10 @@ const connectDB = async () => {
 };
 
 connectDB();
+
+// Використовуємо маршрути
+app.use('/api/users', userRoutes);
+app.use('/api/voiceRecords', voiceRecordRoutes);
 
 // Базовий маршрут
 app.get('/', (req, res) => {
