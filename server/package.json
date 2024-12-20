@@ -17,6 +17,7 @@
     "deepspeech": "^0.9.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "fluent-ffmpeg": "^2.1.3",
     "fs": "^0.0.1-security",
     "mongodb": "^4.10.0",
     "mongoose": "^6.11.5",

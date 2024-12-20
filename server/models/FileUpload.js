@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const voiceRecordSchema = new mongoose.Schema(
+const fileUploadSchema = new mongoose.Schema(
   {
     audioFile: {
       type: String, // шлях до аудіофайлу або URL
@@ -25,6 +25,6 @@ const voiceRecordSchema = new mongoose.Schema(
   }
 );
 
-const VoiceRecord = mongoose.model('VoiceRecord', voiceRecordSchema);
+const FileUpload = mongoose.model('FileUpload', fileUploadSchema);
 
-export default VoiceRecord;
+export default FileUpload;

@@ -4,88 +4,119 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import multer from 'multer';
 import fs from 'fs';
-import deepspeech from 'deepspeech';
-import path from 'path';
+import path from 'path'; // Додано для коректної роботи з __dirname
 import userRoutes from './routes/userRoutes.js';
-import voiceRecordRoutes from './routes/voiceRecordRoutes.js';
+import fileUploadRoutes from './routes/fileUploadRoutes.js';
+import convertVoiceRoutes from './routes/convertVoiceRoutes.js';
+import FileUpload from './models/FileUpload.js';
+import fileUploadController from './controllers/fileUploadController.js';
 
-dotenv.config(); // Завантаження змінних середовища
+// Завантаження змінних середовища
+dotenv.config();
 
+// Ініціалізація додатку
 const app = express();
 const PORT = process.env.PORT || 5000;
-// Місце для зберігання файлів
-const upload = multer({ dest: 'uploads/' });
-// Завантажуємо модель DeepSpeech
-const modelPath = path.join(
-  __dirname,
-  'models',
-  'deepspeech-0.9.3-models.pbmm'
-);
-// const scorerPath = './models/deepspeech-0.9.3-models.scorer'; // Якщо ви використовуєте scorer
-if (!fs.existsSync(modelPath)) {
-  console.error('Model file not found:', modelPath);
-  process.exit(1);
+
+// Створення __dirname для ES-модулів
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
+// Створюємо папку для зберігання файлів
+const uploadPath = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
 }
-const model = new deepspeech.Model(modelPath);
+
+// Налаштовуємо Multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadPath); // Вказуємо шлях до папки
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + file.originalname;
+    cb(null, uniqueSuffix);
+  },
+});
+
+const upload = multer({ storage });
 
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Підключення до MongoDB
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log('🔥 MongoDB connected successfully!');
   } catch (error) {
     console.error('❌ MongoDB connection failed:', error.message);
-    process.exit(1); // Завершити процес у разі помилки
+    process.exit(1);
   }
 };
 
 connectDB();
 
-// Використовуємо маршрути
+// Маршрути
 app.use('/api/users', userRoutes);
-app.use('/api/voiceRecords', voiceRecordRoutes);
-// Роут для прийому аудіофайлу
-app.post('/api/transcribe', upload.single('audio'), (req, res) => {
-  // Перевірка наявності файлу
-  if (!req.file) {
-    return res.status(400).send({ error: 'No file uploaded' });
-  }
+app.use('/api/voiceRecords', fileUploadRoutes);
+app.use('/api/convertVoiceRecords', convertVoiceRoutes);
 
-  // Базовий маршрут
-  app.get('/', (req, res) => {
-    res.send('API is running...');
-  });
+//Перевірka помилки
+app.use((req, res, next) => {
+  console.log(`Received request: ${req.method} ${req.originalUrl}`);
+  next();
+});
 
-  // Читання аудіофайлу
-  const audioPath = path.join(__dirname, req.file.path);
-  const buffer = fs.readFileSync(audioPath);
+// Базовий маршрут
+app.get('/', (req, res) => {
+  res.send('API is running...');
+});
 
-  // Перетворення аудіофайлу в текст
-  const audioLength = buffer.length / 2; // Припускаємо 16-бітний аудіофайл
-  const audioData = new Int16Array(buffer.buffer);
+// Маршрут для завантаження файлів
+app.post('/api/upload', upload.single('audioFile'), fileUploadController);
+
+// // Отримання запису
+// app.get('/api/voiceRecords/record', async (req, res) => {
+//   try {
+//     const records = await FileUpload.find(); // Перевірка на наявність записів
+//     res
+//       .status(200)
+//       .json({ message: 'Records fetched successfully', records: records });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Server error', error: error.message });
+//   }
+// });
+
+// Маршрут для отримання тексту голосового запису
+app.get('/api/voiceRecords/:recordId/text', async (req, res) => {
+  const { recordId } = req.params;
 
   try {
-    const transcript = model.stt(audioData); // Розпізнавання тексту
-    res.json({ text: transcript });
+    // Шукаємо запис у базі даних
+    const fileUpload = await FileUpload.findById(recordId);
+    if (!fileUpload) {
+      return res.status(404).json({ message: 'Запис не знайдено' });
+    }
+
+    // Повертаємо текст із бази даних
+    res.status(200).json({
+      text: fileUpload.text, // Текст з бази даних
+    });
   } catch (error) {
-    console.error('Error during transcription', error);
-    res.status(500).send({ error: 'Error during transcription' });
-  } finally {
-    // Видаляємо тимчасовий файл
-    fs.unlinkSync(audioPath);
+    console.error('Помилка під час отримання тексту:', error);
+    res.status(500).json({
+      message: 'Помилка під час отримання тексту',
+      error,
+    });
   }
 });
 
 // Запуск сервера
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
-});
-
-//тестовий маршрут для перевірки
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'Backend is working correctly!' });
 });
