@@ -17,19 +17,19 @@ const fileUploadController = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    //Перевірка наявності файла
-    const existingFile = await FileUpload.findOne({
-      userId,
-      audioFile: req.file.originalname,
-    });
+    // //Перевірка наявності файла
+    // const existingFile = await FileUpload.findOne({
+    //   userId,
+    //   audioFile: audioFile.fieldname,
+    // });
 
-    if (existingFile) {
-      return res.status(409).json({ message: 'Файл вже існує' });
-    }
+    // if (existingFile) {
+    //   return res.status(409).json({ message: 'Файл вже існує' });
+    // }
 
     // Створення нового запису файлу
     const newFileUpload = new FileUpload({
-      audioFile: audioFile.path, // зберігаємо шлях до файлу
+      audioFile: audioFile.fieldname,
       text,
       userId,
     });

@@ -6,9 +6,7 @@ const FileUpload = ({ handleAction }) => {
   const [userId, setUserId] = useState('67648102b7df2cd9ebcd41be');
 
   const handleFileChange = (event) => {
-    handleAction();
     const selectedFile = event.target.files[0];
-    console.log(file);
     setFile(selectedFile);
   };
 
@@ -35,17 +33,14 @@ const FileUpload = ({ handleAction }) => {
       );
       alert(response.data.message);
     } catch (error) {
-      if (error.response?.status === 409) {
-        // Сервер повернув код 409, файл вже існує
-        alert('Такий файл вже завантажено!');
+      if (error.response) {
+        // if (error.response.status === 409) {
+        //   alert('Такий файл вже завантажено!');
+        // } else {
+        alert(error.response.data?.message || 'Сталася помилка');
+        // }
       } else {
-        console.error(
-          'Помилка:',
-          error.response?.data?.message || error.message
-        );
-        if (error.response?.status === 409) {
-          alert('Такий файл вже існує!');
-        }
+        alert('Невідома помилка при завантаженні');
       }
     }
   };
@@ -53,7 +48,11 @@ const FileUpload = ({ handleAction }) => {
   return (
     <div>
       <h2>Завантаження файлу</h2>
-      <input type="file" onChange={handleFileChange} />
+      <input
+        type="file"
+        onChange={handleFileChange}
+        onClick={() => handleAction()}
+      />
       <button onClick={handleFileUpload}>Завантажити</button>
     </div>
   );
