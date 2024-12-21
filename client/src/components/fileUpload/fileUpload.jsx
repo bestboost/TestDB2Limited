@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const FileUpload = () => {
+const FileUpload = ({ handleAction }) => {
   const [file, setFile] = useState(null);
   const [userId, setUserId] = useState('67648102b7df2cd9ebcd41be');
 
   const handleFileChange = (event) => {
+    handleAction();
     const selectedFile = event.target.files[0];
+    console.log(selectedFile);
     setFile(selectedFile);
   };
 

@@ -63,6 +63,7 @@ connectDB();
 
 // Маршрути
 app.use('/api/users', userRoutes);
+app.use('/auth', userRoutes);
 app.use('/api/voiceRecords', fileUploadRoutes);
 app.use('/api/convertVoiceRecords', convertVoiceRoutes);
 
