@@ -8,7 +8,7 @@ const FileUpload = ({ handleAction }) => {
   const handleFileChange = (event) => {
     handleAction();
     const selectedFile = event.target.files[0];
-    console.log(selectedFile);
+    console.log(file);
     setFile(selectedFile);
   };
 
@@ -33,10 +33,20 @@ const FileUpload = ({ handleAction }) => {
           },
         }
       );
-      alert('Файл успішно завантажено!');
-      console.log(response.data);
+      alert(response.data.message);
     } catch (error) {
-      console.error('Помилка при завантаженні файлу:', error);
+      if (error.response?.status === 409) {
+        // Сервер повернув код 409, файл вже існує
+        alert('Такий файл вже завантажено!');
+      } else {
+        console.error(
+          'Помилка:',
+          error.response?.data?.message || error.message
+        );
+        if (error.response?.status === 409) {
+          alert('Такий файл вже існує!');
+        }
+      }
     }
   };
 

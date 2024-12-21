@@ -22,3 +22,4 @@ server/.env
 # Додаткові тимчасові файли
 .DS_Store
 *.swp
+uploads

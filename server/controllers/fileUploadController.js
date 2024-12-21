@@ -17,6 +17,16 @@ const fileUploadController = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    //Перевірка наявності файла
+    const existingFile = await FileUpload.findOne({
+      userId,
+      audioFile: req.file.originalname,
+    });
+
+    if (existingFile) {
+      return res.status(409).json({ message: 'Файл вже існує' });
+    }
+
     // Створення нового запису файлу
     const newFileUpload = new FileUpload({
       audioFile: audioFile.path, // зберігаємо шлях до файлу
@@ -28,7 +38,7 @@ const fileUploadController = async (req, res) => {
     await newFileUpload.save();
 
     res.status(201).json({
-      message: 'Voice record created successfully',
+      message: 'Ваш файл завантажено',
       FileUpload: newFileUpload,
     });
   } catch (error) {

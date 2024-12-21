@@ -9,7 +9,6 @@ import userRoutes from './routes/userRoutes.js';
 import fileUploadRoutes from './routes/fileUploadRoutes.js';
 import convertVoiceRoutes from './routes/convertVoiceRoutes.js';
 import FileUpload from './models/FileUpload.js';
-import fileUploadController from './controllers/fileUploadController.js';
 
 // Завантаження змінних середовища
 dotenv.config();
@@ -64,7 +63,7 @@ connectDB();
 // Маршрути
 app.use('/api/users', userRoutes);
 app.use('/auth', userRoutes);
-app.use('/api/voiceRecords', fileUploadRoutes);
+app.use('/api/upload', fileUploadRoutes);
 app.use('/api/convertVoiceRecords', convertVoiceRoutes);
 
 //Перевірka помилки
@@ -77,21 +76,6 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
-
-// Маршрут для завантаження файлів
-app.post('/api/upload', upload.single('audioFile'), fileUploadController);
-
-// // Отримання запису
-// app.get('/api/voiceRecords/record', async (req, res) => {
-//   try {
-//     const records = await FileUpload.find(); // Перевірка на наявність записів
-//     res
-//       .status(200)
-//       .json({ message: 'Records fetched successfully', records: records });
-//   } catch (error) {
-//     res.status(500).json({ message: 'Server error', error: error.message });
-//   }
-// });
 
 // Маршрут для отримання тексту голосового запису
 app.get('/api/voiceRecords/:recordId/text', async (req, res) => {
