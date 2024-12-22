@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useUser } from '../../utils/UserContext';
 
 const FileUpload = ({ handleAction }) => {
   const [file, setFile] = useState(null);
-  const [userId, setUserId] = useState('67648102b7df2cd9ebcd41be');
-
+  const { userId, error } = useUser();
+  useEffect(() => {
+    console.log('Updated userId in component:', userId);
+  }, [userId]);
+  console.log('App component:', { userId, error });
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     setFile(selectedFile);
@@ -16,10 +20,18 @@ const FileUpload = ({ handleAction }) => {
       return;
     }
 
+    const token = localStorage.getItem('token'); // Отримуємо токен з localStorage
+    if (!token) {
+      alert('Токен відсутній');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('audioFile', file);
     formData.append('text', 'example text');
     formData.append('userId', userId);
+    console.log('userId:', userId);
+    console.log('Token:', token);
 
     try {
       const response = await axios.post(
@@ -28,9 +40,11 @@ const FileUpload = ({ handleAction }) => {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
           },
         }
       );
+
       alert(response.data.message);
     } catch (error) {
       if (error.response) {

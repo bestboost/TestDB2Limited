@@ -9,6 +9,7 @@ import userRoutes from './routes/userRoutes.js';
 import fileUploadRoutes from './routes/fileUploadRoutes.js';
 import convertVoiceRoutes from './routes/convertVoiceRoutes.js';
 import FileUpload from './models/FileUpload.js';
+import userRecordsRoutes from './routes/userRecordsRoutes.js';
 
 // Завантаження змінних середовища
 dotenv.config();
@@ -44,6 +45,8 @@ app.use(express.json());
 app.use(cors());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+mongoose.set('strictQuery', false); // Можете встановити true, якщо хочете уникнути попередження
+
 // Підключення до MongoDB
 const connectDB = async () => {
   try {
@@ -64,6 +67,7 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/auth', userRoutes);
 app.use('/api/upload', fileUploadRoutes);
+app.use('/api/records', userRecordsRoutes);
 app.use('/api/convertVoiceRecords', convertVoiceRoutes);
 
 //Перевірka помилки

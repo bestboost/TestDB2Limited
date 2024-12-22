@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
-
+import authenticateToken from '../middleware/authMiddleware.js';
 import fileUploadController from '../controllers/fileUploadController.js';
 
 const router = express.Router();
@@ -20,6 +20,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Маршрут для завантаження аудіофайлу
-router.post('/', upload.single('audioFile'), fileUploadController);
+router.post(
+  '/',
+  authenticateToken,
+  upload.single('audioFile'),
+  fileUploadController
+);
 
 export default router;

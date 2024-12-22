@@ -25,39 +25,54 @@ const registerUser = async (req, res) => {
     // Збереження користувача в БД
     await newUser.save();
 
+    // Генерація токена
+    const token = jwt.sign(
+      { userId: newUser._id }, // payload
+      process.env.JWT_SECRET, // секретний ключ
+      { expiresIn: '1h' } // час дії токена
+    );
+
     res.status(201).json({
       message: 'Реєстрація успішна',
-      user: newUser,
+      token,
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+      },
     });
   } catch (error) {
-    console.error(error); // Логування помилок
-    res.status(500).json({ message: 'Error creating user', error });
+    console.error('Помилка реєстрації:', error); // Логування помилок
+    res.status(500).json({ message: 'Помилка створення користувача', error });
   }
 };
+
 // Вхід користувача
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Перевірка чи є користувач з таким email
+    // Перевірка, чи є користувач з таким email
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'User not found' });
+      return res.status(400).json({ message: 'Користувача не знайдено' });
     }
 
     // Перевірка паролю
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: 'Невірні облікові дані' });
     }
 
     // Створення токена
-    const token = jwt.sign({ userId: user._id }, 'your_jwt_secret', {
-      expiresIn: '1h',
-    });
+    const token = jwt.sign(
+      { userId: user._id }, // payload
+      process.env.JWT_SECRET, // секретний ключ
+      { expiresIn: '1h' } // час дії токена
+    );
 
     res.status(200).json({
-      message: 'Login successful',
+      message: 'Вхід успішний',
       token,
       user: {
         id: user._id,
@@ -66,8 +81,8 @@ export const loginUser = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error logging in user', error });
+    console.error('Помилка входу:', error);
+    res.status(500).json({ message: 'Помилка входу користувача', error });
   }
 };
 

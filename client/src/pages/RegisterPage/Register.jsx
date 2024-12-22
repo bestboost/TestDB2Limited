@@ -22,7 +22,7 @@ const Register = () => {
       const { token } = response.data;
 
       // Зберігаємо токен і ім'я користувача в localStorage
-      localStorage.setItem('authToken', token);
+      localStorage.setItem('token', token);
       localStorage.setItem('userName', name);
 
       setIsRegistered(true); // Переходимо на сторінку входу після реєстрації

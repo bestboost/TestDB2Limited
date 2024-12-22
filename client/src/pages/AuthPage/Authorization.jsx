@@ -1,39 +1,3 @@
-// import React, { useState } from 'react';
-// import Register from '../../components/Register/Register';
-// import Authorization from '../../components/Authorization/Authorization';
-
-// const AuthPage = () => {
-//   const [isAuthenticated, setIsAuthenticated] = useState(false);
-//   const [userName, setUserName] = useState('');
-//   const [isRegistered, setIsRegistered] = useState(false);
-
-//   return (
-//     <div>
-//       <h1>{isRegistered ? 'Реєстрація' : 'Авторизація'}</h1>
-//       {isRegistered ? (
-//         <Register
-//           setIsAuthenticated={setIsAuthenticated}
-//           setIsRegistered={setIsRegistered}
-//         />
-//       ) : (
-//         <Authorization
-//           setIsAuthenticated={setIsAuthenticated}
-//           setUserName={setUserName}
-//           setIsRegistered={setIsRegistered}
-//         />
-//       )}
-//       <button onClick={() => setIsRegistered(!isRegistered)}>
-//         {isRegistered
-//           ? 'Вже маєте акаунт? Увійдіть'
-//           : 'Не маєте акаунту? Зареєструйтесь'}
-//       </button>
-//     </div>
-//   );
-// };
-
-// export default AuthPage;
-// ?????????????????????
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -56,12 +20,13 @@ const Authorization = () => {
       const { token, name } = response.data;
 
       // Зберігаємо токен і ім'я користувача в localStorage
-      localStorage.setItem('authToken', token);
+      localStorage.setItem('token', token);
       localStorage.setItem('userName', name);
 
       setIsAuthenticated(true);
       alert('Успішна авторизація!');
       navigate('/');
+      window.location.reload();
     } catch (error) {
       console.error('Помилка при авторизації:', error);
       alert('Невірні дані для авторизації');
