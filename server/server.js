@@ -2,9 +2,6 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import multer from 'multer';
-import fs from 'fs';
-import path from 'path'; // Додано для коректної роботи з __dirname
 import userRoutes from './routes/userRoutes.js';
 import fileUploadRoutes from './routes/fileUploadRoutes.js';
 import convertVoiceRoutes from './routes/convertVoiceRoutes.js';
@@ -18,32 +15,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// // Створення __dirname для ES-модулів
-// const __dirname = path.dirname(new URL(import.meta.url).pathname);
-
-// // Створюємо папку для зберігання файлів
-// const uploadPath = path.join(__dirname, 'uploads');
-// if (!fs.existsSync(uploadPath)) {
-//   fs.mkdirSync(uploadPath, { recursive: true });
-// }
-
-// // Налаштовуємо Multer
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, uploadPath); // Вказуємо шлях до папки
-//   },
-//   filename: (req, file, cb) => {
-//     const uniqueSuffix = Date.now() + '-' + file.originalname;
-//     cb(null, uniqueSuffix);
-//   },
-// });
-
-// const upload = multer({ storage });
-
 // Middleware
 app.use(express.json());
 app.use(cors());
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 mongoose.set('strictQuery', false); // Можете встановити true, якщо хочете уникнути попередження
 

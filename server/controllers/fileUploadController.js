@@ -1,5 +1,4 @@
 import FileUpload from '../models/FileUpload.js';
-import User from '../models/User.js';
 
 const fileUploadController = async (req, res) => {
   try {
