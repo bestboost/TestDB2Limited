@@ -21,14 +21,25 @@ export const UserProvider = ({ children }) => {
 
       console.log('Token:', token);
 
-      const response = await axios.get('/auth/getUserId', {
+      const response = await axios.get('http://localhost:5000/auth/getUserId', {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
+      // Перевіряємо статус відповіді, якщо не 2xx
+      if (response.status !== 200) {
+        console.log(`Error: ${response.status}`);
+        setError('Помилка при отриманні userId');
+        return;
+      }
 
-      setUserId(response.data.userId);
-      console.log('Fetched userId:', response.data.userId);
+      console.log('Response:', response);
+      if (response.data && response.data.userId) {
+        setUserId(response.data.userId);
+        console.log('Fetched userId:', response.data.userId);
+      } else {
+        setError('Не вдалося отримати userId');
+      }
     } catch (err) {
       console.error('Помилка при отриманні userId:', err);
       setError('Не вдалося отримати userId');

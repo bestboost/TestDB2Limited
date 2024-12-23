@@ -1,27 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useUser } from '../../utils/UserContext';
+// import { useUser } from '../../utils/UserContext';
 
 const Dashboard = () => {
   const [records, setRecords] = useState([]);
-  const { userId, error } = useUser();
+  // const { userId, error } = useUser();
 
   useEffect(() => {
-    if (userId) {
-      const fetchRecords = async () => {
-        try {
-          const response = await axios.get(
-            `http://localhost:5000/api/records/${userId}`
-          );
-          setRecords(response.data.records);
-        } catch (error) {
-          console.error('Error fetching records:', error);
-        }
-      };
+    // if (userId) {
+    const fetchRecords = async () => {
+      const token = localStorage.getItem('token'); // Отримуємо токен з localStorage
+      if (!token) {
+        alert('Токен відсутній');
+        return;
+      }
+      console.log('Token:', token);
+      try {
+        const response = await axios.get(`http://localhost:5000/api/records`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log('Fetched records:', response.data.records);
+        console.log('Fetched records:', response.data);
+
+        setRecords(response.data.records);
+      } catch (error) {
+        console.error('Error fetching records:', error);
+      }
+      // };
 
       fetchRecords();
-    }
-  }, [userId]);
+    };
+  }, []);
 
   return (
     <div>

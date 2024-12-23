@@ -1,8 +1,9 @@
 import express from 'express';
-import getUserRecords from '../controllers/userRecordsСontroller.js'; // імпортуємо контролер
+import getUserRecords from '../controllers/UserRecordsСontroller.js'; // імпортуємо контролер
+import getUserId from '../controllers/authController.js';
 
 const router = express.Router();
 
-router.get('/api/records/:userId', getUserRecords); // новий маршрут для отримання записів
+router.get('/records', getUserId, getUserRecords); // новий маршрут для отримання записів
 
 export default router;

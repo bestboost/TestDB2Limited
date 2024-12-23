@@ -90,11 +90,7 @@ const HomePage = () => {
         )}
       </div>
       <FileUpload handleAction={handleAction} />
-      {/* {userId ? ( */}
-      {/* <Dashboard /> */}
-      {/* ) : (
-        <p>Будь ласка, увійдіть для перегляду записів</p>
-      )} */}
+      <Dashboard />
       <AudioToText text={text} loading={loading} error={error} />
     </>
   );

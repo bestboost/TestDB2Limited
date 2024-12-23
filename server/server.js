@@ -9,7 +9,7 @@ import userRoutes from './routes/userRoutes.js';
 import fileUploadRoutes from './routes/fileUploadRoutes.js';
 import convertVoiceRoutes from './routes/convertVoiceRoutes.js';
 import FileUpload from './models/FileUpload.js';
-import userRecordsRoutes from './routes/userRecordsRoutes.js';
+import recordsRoutes from './routes/UserRecordsRoutes.js';
 
 // Завантаження змінних середовища
 dotenv.config();
@@ -18,32 +18,32 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Створення __dirname для ES-модулів
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+// // Створення __dirname для ES-модулів
+// const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-// Створюємо папку для зберігання файлів
-const uploadPath = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
+// // Створюємо папку для зберігання файлів
+// const uploadPath = path.join(__dirname, 'uploads');
+// if (!fs.existsSync(uploadPath)) {
+//   fs.mkdirSync(uploadPath, { recursive: true });
+// }
 
-// Налаштовуємо Multer
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadPath); // Вказуємо шлях до папки
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + file.originalname;
-    cb(null, uniqueSuffix);
-  },
-});
+// // Налаштовуємо Multer
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, uploadPath); // Вказуємо шлях до папки
+//   },
+//   filename: (req, file, cb) => {
+//     const uniqueSuffix = Date.now() + '-' + file.originalname;
+//     cb(null, uniqueSuffix);
+//   },
+// });
 
-const upload = multer({ storage });
+// const upload = multer({ storage });
 
 // Middleware
 app.use(express.json());
 app.use(cors());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 mongoose.set('strictQuery', false); // Можете встановити true, якщо хочете уникнути попередження
 
@@ -63,17 +63,25 @@ const connectDB = async () => {
 
 connectDB();
 
-// Маршрути
-app.use('/api/users', userRoutes);
-app.use('/auth', userRoutes);
-app.use('/api/upload', fileUploadRoutes);
-app.use('/api/records', userRecordsRoutes);
-app.use('/api/convertVoiceRecords', convertVoiceRoutes);
-
-//Перевірka помилки
+// Логування всіх запитів
 app.use((req, res, next) => {
   console.log(`Received request: ${req.method} ${req.originalUrl}`);
   next();
+});
+
+// Маршрути
+// app.use('/api/users', userRoutes);
+app.use('/auth', userRoutes);
+app.use('/api/upload', fileUploadRoutes);
+app.use('/api', recordsRoutes);
+app.use('/api/convertVoiceRecords', convertVoiceRoutes);
+
+console.log('Маршрут /auth підключається');
+
+//спеціальний обробник 404
+app.use((req, res) => {
+  console.log(`404 Error: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ message: 'Маршрут не знайдено' });
 });
 
 // Базовий маршрут

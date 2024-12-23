@@ -3,19 +3,25 @@ import User from '../models/User.js';
 
 const fileUploadController = async (req, res) => {
   try {
-    const { text, userId } = req.body; // отримуємо текст і userId
-    const audioFile = req.file; // отримуємо файл
+    const userId = req.user?.userId;
 
-    // Перевірка наявності файлу
-    if (!audioFile) {
-      return res.status(400).json({ message: 'Audio file is required' });
-    }
-
-    // Перевірка наявності користувача
-    const user = await User.findById(userId);
-    if (!user) {
+    if (!userId) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    const { text } = req.body; // Текст з тіла запиту
+    const audioFile = req.file; // Файл з multer
+
+    if (!audioFile) {
+      return res.status(400).json({ message: 'File is missing' });
+    }
+
+    if (!text) {
+      return res.status(400).json({ message: 'Text is missing' });
+    }
+
+    console.log('Received text:', text);
+    console.log('Received audio file:', audioFile);
 
     // //Перевірка наявності файла
     // const existingFile = await FileUpload.findOne({
@@ -29,7 +35,7 @@ const fileUploadController = async (req, res) => {
 
     // Створення нового запису файлу
     const newFileUpload = new FileUpload({
-      audioFile: audioFile.fieldname,
+      audioFile: audioFile.filename,
       text,
       userId,
     });

@@ -4,11 +4,13 @@ import { useUser } from '../../utils/UserContext';
 
 const FileUpload = ({ handleAction }) => {
   const [file, setFile] = useState(null);
-  const { userId, error } = useUser();
-  useEffect(() => {
-    console.log('Updated userId in component:', userId);
-  }, [userId]);
-  console.log('App component:', { userId, error });
+  // const { userId, error } = useUser();
+
+  // // Логування userId при його оновленні
+  // useEffect(() => {
+  //   console.log('Updated userId in component:', userId);
+  // }, [userId]);
+
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     setFile(selectedFile);
@@ -20,7 +22,8 @@ const FileUpload = ({ handleAction }) => {
       return;
     }
 
-    const token = localStorage.getItem('token'); // Отримуємо токен з localStorage
+    const token = localStorage.getItem('token');
+    console.log(token);
     if (!token) {
       alert('Токен відсутній');
       return;
@@ -29,9 +32,6 @@ const FileUpload = ({ handleAction }) => {
     const formData = new FormData();
     formData.append('audioFile', file);
     formData.append('text', 'example text');
-    formData.append('userId', userId);
-    console.log('userId:', userId);
-    console.log('Token:', token);
 
     try {
       const response = await axios.post(
@@ -48,11 +48,7 @@ const FileUpload = ({ handleAction }) => {
       alert(response.data.message);
     } catch (error) {
       if (error.response) {
-        // if (error.response.status === 409) {
-        //   alert('Такий файл вже завантажено!');
-        // } else {
         alert(error.response.data?.message || 'Сталася помилка');
-        // }
       } else {
         alert('Невідома помилка при завантаженні');
       }
@@ -73,3 +69,46 @@ const FileUpload = ({ handleAction }) => {
 };
 
 export default FileUpload;
+
+// import React, { useState } from 'react';
+
+// const FileUpload = ({ handleAction, userId }) => {
+//   const [file, setFile] = useState(null);
+
+//   // Тепер userId не потрібно оголошувати через useState, бо воно передається як пропс.
+//   console.log('User ID:', userId); // Використовуємо userId, передане як пропс
+
+//   const handleFileChange = (event) => {
+//     setFile(event.target.files[0]);
+//   };
+
+//   const handleFileUpload = async () => {
+//     if (!file) {
+//       alert('Будь ласка, виберіть файл для завантаження.');
+//       return;
+//     }
+
+//     try {
+//       const formData = new FormData();
+//       formData.append('file', file);
+//       formData.append('userId', userId); // Додаємо userId у FormData, якщо потрібно
+
+//       // Логіка для завантаження файлу через API або іншими методами
+//       await handleAction(formData);
+//       alert('Файл успішно завантажено!');
+//     } catch (error) {
+//       console.error('Помилка завантаження файлу:', error);
+//       alert('Помилка завантаження файлу.');
+//     }
+//   };
+
+//   return (
+//     <div>
+//       <h2>Завантаження файлів</h2>
+//       <input type="file" onChange={handleFileChange} />
+//       <button onClick={handleFileUpload}>Завантажити</button>
+//     </div>
+//   );
+// };
+
+// export default FileUpload;
