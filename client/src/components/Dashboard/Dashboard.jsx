@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-// import { useUser } from '../../utils/UserContext';
 
 const Dashboard = () => {
   const [records, setRecords] = useState([]);
-  // const { userId, error } = useUser();
 
   useEffect(() => {
-    // if (userId) {
     const fetchRecords = async () => {
       const token = localStorage.getItem('token'); // Отримуємо токен з localStorage
       if (!token) {
@@ -22,22 +19,18 @@ const Dashboard = () => {
           },
         });
         console.log('Fetched records:', response.data.records);
-        console.log('Fetched records:', response.data);
-
         setRecords(response.data.records);
       } catch (error) {
-        console.error('Error fetching records:', error);
+        console.error('Error response:', error.response); // Логування відповіді з помилкою
       }
-      // };
-
-      fetchRecords();
     };
+    fetchRecords();
   }, []);
 
   return (
     <div>
       <h2>Мої записи</h2>
-      <ul>
+      <ol>
         {records.map((record) => (
           <li key={record._id}>
             <h3>{record.text}</h3>
@@ -50,7 +43,7 @@ const Dashboard = () => {
             </audio>
           </li>
         ))}
-      </ul>
+      </ol>
     </div>
   );
 };

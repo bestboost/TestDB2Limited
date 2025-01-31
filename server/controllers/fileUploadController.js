@@ -14,7 +14,7 @@ const fileUploadController = async (req, res) => {
     if (!audioFile) {
       return res.status(400).json({ message: 'File is missing' });
     }
-
+    console.log('req.file', req.file);
     if (!text) {
       return res.status(400).json({ message: 'Text is missing' });
     }
